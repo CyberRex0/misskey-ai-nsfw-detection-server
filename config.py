@@ -1,0 +1,1 @@
+MODEL_NAME = 'Falconsai/nsfw_image_detection'

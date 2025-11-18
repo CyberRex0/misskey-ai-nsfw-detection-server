@@ -1,0 +1,14 @@
+[project]
+name = "misskey-ai-nsfw-detection-server"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi>=0.121.2",
+    "pillow>=12.0.0",
+    "python-multipart>=0.0.20",
+    "torch>=2.9.1",
+    "transformers>=4.57.1",
+    "uvicorn>=0.38.0",
+]
