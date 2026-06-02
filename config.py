@@ -1,1 +1,2 @@
-MODEL_NAME = 'Falconsai/nsfw_image_detection'
+MODEL_NAME = 'Falconsai/nsfw_image_detection_26'
+HUGGINGFACE_TOKEN = 'hf_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'

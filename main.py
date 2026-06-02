@@ -14,7 +14,13 @@ def app_root():
 @app.post("/api/eval-image")
 def eval_image(file: Annotated[bytes, File()]):
     img = Image.open(BytesIO(file))
-    classifier = pipeline("image-classification", model=config.MODEL_NAME)
+
+    classifier = pipeline(
+        "image-classification",
+        model=config.MODEL_NAME,
+        token=config.HUGGINGFACE_TOKEN
+    )
+
     result = classifier(img)
     nsfw_score = [x for x in result if x["label"] == "nsfw"][0]["score"]
     normal_score = [x for x in result if x["label"] == "normal"][0]["score"]

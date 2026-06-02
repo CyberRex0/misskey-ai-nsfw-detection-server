@@ -2,9 +2,10 @@
 このソフトウェアは、Misskeyにおいてセンシティブなメディアの検出処理を外部に分離するにあたり
 サンプル実装を行ったものです。
 
-デフォルトでは、検出モデルに [Falconsai/nsfw_image_detection](https://huggingface.co/Falconsai/nsfw_image_detection) を利用します。
+デフォルトでは、検出モデルに [Falconsai/nsfw_image_detection_26](https://huggingface.co/Falconsai/nsfw_image_detection_26) を利用します。
 
-config.pyの`MODEL_NAME`を編集することで別なモデルに変更可能です。
+config.pyの`MODEL_NAME`を編集することで別なモデルに変更可能です。<br>
+Gated Modelの場合は`HUGGINGFACE_TOKEN`を設定することでプログラムからアクセス可能です。
 
 ## API仕様
 ###  /api/eval-image
