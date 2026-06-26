@@ -1,14 +1,42 @@
+from contextlib import asynccontextmanager
 from fastapi import Depends, FastAPI, File, HTTPException, Request
 from starlette.datastructures import UploadFile
 from PIL import Image
 from fastapi.datastructures import FormData
-from transformers import pipeline
-from typing import Annotated, List
+from transformers import ImageClassificationPipeline, pipeline
+from typing import List
 from io import BytesIO
+import gc
+
 import config
 
-app = FastAPI()
+classifier: ImageClassificationPipeline | None = None
+
 MAX_FILE_SIZE_BYTES = 1024 * 1024 * 24
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    global classifier
+    classifier = pipeline(
+        "image-classification",
+        model=config.MODEL_NAME,
+        token=config.HUGGINGFACE_TOKEN
+    )
+
+    try:
+        if getattr(config, 'MAX_FILE_SIZE_BYTES'):
+            max_file_size = getattr(config, 'MAX_FILE_SIZE_BYTES')
+            if isinstance(max_file_size, int):
+                MAX_FILE_SIZE_BYTES = max_file_size
+    except:
+        pass
+
+    yield
+
+    del classifier
+    gc.collect()
+
+app = FastAPI(lifespan=lifespan)
 
 @app.get("/")
 async def app_root():
@@ -29,6 +57,9 @@ async def validate_upload(request: Request):
 @app.post("/v1/detect-images")
 #async def eval_image(files: Annotated[list[bytes], File()]):
 async def eval_image(body: FormData = Depends(validate_upload)):
+    if classifier is None:
+        raise HTTPException(status_code=500, detail='Classifier is not initialized')
+
     results: List[dict] = []
     files: List[UploadFile] = []
 
@@ -40,14 +71,18 @@ async def eval_image(body: FormData = Depends(validate_upload)):
                     files.append(ff)
                 
     for f in files:
+        if not f.size or f.size > MAX_FILE_SIZE_BYTES:
+            results.append({
+                'success': False,
+                'error': {
+                    'code': 'FAILED',
+                    'message': 'File size too large' if f.size is not None else 'File size is unknown'
+                }
+            })
+            continue
+
         try:
             img = Image.open(BytesIO(await f.read()))
-
-            classifier = pipeline(
-                "image-classification",
-                model=config.MODEL_NAME,
-                token=config.HUGGINGFACE_TOKEN
-            )
 
             result = classifier(img)
             nsfw_score = [x for x in result if x["label"] == "nsfw"][0]["score"]
