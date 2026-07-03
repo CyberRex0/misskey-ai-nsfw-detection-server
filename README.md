@@ -100,7 +100,9 @@ uv sync # 依存パッケージのインストール
 uv run uvicorn main:app --port PORT # サーバー起動
 ```
 
-※`--port`を指定しなかった場合、デフォルトでは 8000 を使用します。
+※`--host`でリッスンするIPアドレスを変更できます。デフォルトは `127.0.0.1` です。
+
+※`--port`でリッスンするポートを変更できます。デフォルトでは `8000` です。
 
 > [!IMPORTANT]
 > GPUを使用する場合は、pyproject.toml の末尾に以下を追記してください。
@@ -120,7 +122,9 @@ curl を使ってファイルを送信することが出来ます。
 curl -X POST -F "image0=@sample1.jpg" http://hostname:8000/api/eval-image
 ```
 
-例のように `-F "imageX=@ファイル名"` と指定すると、multipart/form-data形式でPOSTリクエストが発行されます。
+例のように `-F "image0=@ファイル名"` と指定すると、multipart/form-data形式でPOSTリクエストが発行されます。
+
+複数渡す場合は、`image0` の 数字部分 (0) を増やして指定していきます。
 
 ファイル名先頭の`@`はcurlでローカルファイルを指す記号であるため、必ずつけてください。
 
